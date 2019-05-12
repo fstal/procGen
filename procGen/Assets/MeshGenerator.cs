@@ -25,23 +25,28 @@ public class MeshGenerator : MonoBehaviour
 {
 
     Mesh mesh;
+    
+    //Vector2[] uvs;
     Vector3[] vertices;           //vertices
     int[] triangles;              //triangles
     public int xMax = 20;         //xSize  height
     public int zMax = 20;         //zSize  width
 
-    public float lacunarity = 0;
+    public float lacunarity = 0;    //how much detail that is added or removed from each octave, adjusts our frequency
+    public float scale = 20f;       // basically distance from which we view noisemap
+
+    [Range(0f,3f)]
+    public float redistribution = 1f; //raises elevation value to a power
     
     [Range(0f,1.0f)] 
-    public float persistance = 0;
+    public float persistance = 0;   // adjusts amplitude
 
     float frequencyA = 5f;
     float frequencyB = 12f;
     float frequencyC = 20f;
-    float amplitudeA = 15;
-    float amplitudeB = 7.5f;
-    float amplitudeC = 3.75f;
-
+    float amplitudeA = 20;
+    float amplitudeB = 10f;
+    float amplitudeC = 5f;
 
 
     void Start()
@@ -76,23 +81,21 @@ public class MeshGenerator : MonoBehaviour
         // here it gets a bit tricky, since we want to handle the issues of backface culling
         // we need to have the vertices of each triangle (every set of three elements) given
         // in a clockwise order.
-        // e.g [0, 1, 2, 1, 3, 2] would be the two first triangles, forming a square =>
+        // e.g [0, 1, 2, 1, 3, 2] would be the indexes of the vertices for the two first triangles, forming a square =>
         //[ (0,0,0), (0,0,1), (1,0,0), (0,0,1), (1,0,1), (1,0,0) ]
-        // leads to us wanting ish : (z, xMax + 1, z+1)
-        // BUT, 0-indexing??  fixed.
+
             //had weird ass behaviour where it connected last square in a row with first square on
             // the next row
-            // fixed with the ***-marker!
         
-        triangles = new int[xMax * zMax * 6];
-        int vert = 0; 
-        int tri = 0;
+        triangles = new int[xMax * zMax * 6];           // every square needs 6 stored vertice positions, even if theres only 4 actual vertices
+        int vert = 0;                                   // increments 1 every iteration of inner loop
+        int tri = 0;                                    // increments 6 every iteration of inner loop
         
         for (int z = 0; z < zMax; z++)
         {
             for (int x = 0; x < xMax; x++)
             {
-                //First half of square   
+                //First  trianglehalf of square   
                 triangles[tri + 0] = vert + 0;
                 triangles[tri + 1] = vert + xMax + 1;
                 triangles[tri + 2] = vert + 1;
@@ -107,6 +110,20 @@ public class MeshGenerator : MonoBehaviour
             }   
             vert++;
         }
+
+        //uvs = new Vector2[vertices.Length];
+        
+        for (int z = 0, idx = 0; z < zMax + 1; z++) // zMax + 1
+        {
+            for (int x = 0; x < xMax + 1; x++)
+            {
+                vertices[idx] = new Vector3(x, GenerateNoiseValue(x,z), z);
+                idx++;
+            }
+        }
+
+
+
     }
 
     void UpdateMesh()
@@ -120,26 +137,36 @@ public class MeshGenerator : MonoBehaviour
     }
 
     private float GenerateNoiseValue(int x, int z)
+    //we need to make sure not to feed the give the PerlinNoise method a whole number, we need fractions 
     { 
-        float fx = (float)x / xMax;
-        float fz = (float)z / zMax;
+        float fx = (float)x / xMax * scale;
+        float fz = (float)z / zMax * scale;
         //Debug.Log(fx + "   " + fz);
-        Debug.Log(Mathf.PerlinNoise(frequencyA * fx, frequencyA * fz));
+        //Debug.Log(Mathf.PerlinNoise(frequencyA * fx, frequencyA * fz));
         //Debug.Log(x.GetType());
         float noiseValue = Mathf.PerlinNoise(frequencyA * fx, frequencyA * fz) * amplitudeA
-                         ;
-        return noiseValue;
+                         + Mathf.PerlinNoise(frequencyB * fx, frequencyB * fz) * amplitudeB
+                         + Mathf.PerlinNoise(frequencyC * fx, frequencyC * fz) * amplitudeC;
+                        
+        return Mathf.Pow(noiseValue, redistribution);
     }
 
 
-    private void OnDrawGizmos()
-    {
-        if (vertices == null) return;
+    // private void OnDrawGizmos()
+    // {
+    //     if (vertices == null) return;
 
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            Gizmos.DrawSphere(vertices[i], .1f);
-        }
+    //     for (int i = 0; i < vertices.Length; i++)
+    //     {
+    //         Gizmos.DrawSphere(vertices[i], .1f);
+    //     }
         
+    // }
+
+    void OnValidate() 
+    {
+        if (zMax < 1) {zMax = 1;}
+        if (xMax < 1) {xMax = 1;}
+        if (lacunarity < 1) {lacunarity = 1;} 
     }
 }
