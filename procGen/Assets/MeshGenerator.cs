@@ -25,28 +25,32 @@ public class MeshGenerator : MonoBehaviour
 {
 
     Mesh mesh;
-    
-    //Vector2[] uvs;
     Vector3[] vertices;           //vertices
+    Color[] colors;           //colors
     int[] triangles;              //triangles
-    public int xMax = 20;         //xSize  height
-    public int zMax = 20;         //zSize  width
+    public int xMax = 256;         //xSize  height
+    public int zMax = 256;         //zSize  width
 
-    public float lacunarity = 0;    //how much detail that is added or removed from each octave, adjusts our frequency
-    public float scale = 20f;       // basically distance from which we view noisemap
+    public float lacunarity = 1f;    //how much detail that is added or removed from each octave, adjusts our frequency
+    public float scale = 10.03f;       // basically distance from which we view noisemap
+    public float redistribution = 1.09f; //raises elevation value to a power
 
-    [Range(0f,3f)]
-    public float redistribution = 1f; //raises elevation value to a power
-    
+
     [Range(0f,1.0f)] 
     public float persistance = 0;   // adjusts amplitude
+    public Gradient gradient;
 
-    float frequencyA = 5f;
-    float frequencyB = 12f;
-    float frequencyC = 20f;
-    float amplitudeA = 20;
-    float amplitudeB = 10f;
-    float amplitudeC = 5f;
+    float frequencyA = .5f;
+    float frequencyB = 2f;
+    float frequencyC = 8f;
+    float amplitudeA = 30f;
+    float amplitudeB = 7.5f;
+    float amplitudeC = 2f;
+    
+    float maxNoiseValue;
+    float minNoiseValue;
+    float noiseDiff;
+
 
 
     void Start()
@@ -81,9 +85,9 @@ public class MeshGenerator : MonoBehaviour
         // here it gets a bit tricky, since we want to handle the issues of backface culling
         // we need to have the vertices of each triangle (every set of three elements) given
         // in a clockwise order.
-        // e.g [0, 1, 2, 1, 3, 2] would be the indexes of the vertices for the two first triangles, forming a square =>
+        // e.g [0, 1, 2, 1, 3, 2] would be the two first triangles, forming a square =>
         //[ (0,0,0), (0,0,1), (1,0,0), (0,0,1), (1,0,1), (1,0,0) ]
-
+            
             //had weird ass behaviour where it connected last square in a row with first square on
             // the next row
         
@@ -95,12 +99,12 @@ public class MeshGenerator : MonoBehaviour
         {
             for (int x = 0; x < xMax; x++)
             {
-                //First  trianglehalf of square   
+                //First triangle half of square   
                 triangles[tri + 0] = vert + 0;
                 triangles[tri + 1] = vert + xMax + 1;
                 triangles[tri + 2] = vert + 1;
 
-                //Second half of square
+                //Second triangle half of square
                 triangles[tri + 3] = vert + 1;
                 triangles[tri + 4] = vert + xMax + 1;
                 triangles[tri + 5] = vert + xMax + 2;  
@@ -110,20 +114,7 @@ public class MeshGenerator : MonoBehaviour
             }   
             vert++;
         }
-
-        //uvs = new Vector2[vertices.Length];
-        
-        for (int z = 0, idx = 0; z < zMax + 1; z++) // zMax + 1
-        {
-            for (int x = 0; x < xMax + 1; x++)
-            {
-                vertices[idx] = new Vector3(x, GenerateNoiseValue(x,z), z);
-                idx++;
-            }
-        }
-
-
-
+        ColorTerrain();
     }
 
     void UpdateMesh()
@@ -132,25 +123,43 @@ public class MeshGenerator : MonoBehaviour
 
         mesh.vertices = vertices;
         mesh.triangles = triangles;
+        mesh.colors = colors;
 
         mesh.RecalculateNormals();      //using inbuilt, we could just as well calculate them ourselves, y tho
     }
 
     private float GenerateNoiseValue(int x, int z)
-    //we need to make sure not to feed the give the PerlinNoise method a whole number, we need fractions 
     { 
         float fx = (float)x / xMax * scale;
         float fz = (float)z / zMax * scale;
-        //Debug.Log(fx + "   " + fz);
         //Debug.Log(Mathf.PerlinNoise(frequencyA * fx, frequencyA * fz));
         //Debug.Log(x.GetType());
+        //Debug.Log(fx + "   " + fz);
         float noiseValue = Mathf.PerlinNoise(frequencyA * fx, frequencyA * fz) * amplitudeA
-                         + Mathf.PerlinNoise(frequencyB * fx, frequencyB * fz) * amplitudeB
+                         + Mathf.PerlinNoise(frequencyB * fx, frequencyB * fz) * amplitudeB 
                          + Mathf.PerlinNoise(frequencyC * fx, frequencyC * fz) * amplitudeC;
-                        
+
+        if (noiseValue > maxNoiseValue) maxNoiseValue = noiseValue;
+        if (noiseValue < minNoiseValue) minNoiseValue = noiseValue;
+
         return Mathf.Pow(noiseValue, redistribution);
     }
 
+    private void ColorTerrain()
+    {
+    colors = new Color[vertices.Length];      //could just as well use the length from vertices, should be same
+    noiseDiff = maxNoiseValue - minNoiseValue;
+
+    for (int z = 0, idx = 0; z < zMax + 1; z++) 
+        {
+            for (int x = 0; x < xMax + 1; x++)
+            {
+                float normNoiseValue = ((vertices[idx].y - minNoiseValue) / noiseDiff); //inverselerp??
+                colors[idx] = gradient.Evaluate(normNoiseValue);        
+                idx++;
+            }
+        }
+    }
 
     // private void OnDrawGizmos()
     // {
