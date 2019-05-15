@@ -15,7 +15,7 @@ using UnityEngine;
 // https://docs.unity3d.com/ScriptReference/Mesh-uv.html
 //mesh.uv => is an array of Vector2s that can have values between (0,0) and (1,1). The values represent fractional offsets into a texture. For example, (0,0) is the lower left corner and (0.5, 0.5) is the middle of the texture.
 
-// vertex count = (width + 1) * (lenght + 1) 
+// vertex count = (width + 1) * (height + 1) 
 
 //https://docs.unity3d.com/ScriptReference/Mathf.PerlinNoise.html
 
@@ -28,8 +28,9 @@ public class MeshGenerator : MonoBehaviour
     Vector3[] vertices;           //vertices
     Color[] colors;           //colors
     int[] triangles;              //triangles
-    public int xMax = 256;         //xSize  height
-    public int zMax = 256;         //zSize  width
+    public bool autoUpdate;
+    public int xMax = 255;         //xSize  height
+    public int zMax = 255;         //zSize  width
 
     public float lacunarity = 1f;    //how much detail that is added or removed from each octave, adjusts our frequency
     public float scale = 10.03f;       // basically distance from which we view noisemap
@@ -49,7 +50,7 @@ public class MeshGenerator : MonoBehaviour
     
     float maxNoiseValue;
     float minNoiseValue;
-    float noiseDiff;
+    //float noiseDiff;
 
 
 
@@ -58,14 +59,23 @@ public class MeshGenerator : MonoBehaviour
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
-        //Tests
-    
+        CreateShape();
+        UpdateMesh();
+    }
 
-        // End tests
+    // void Update()
+    // {
+    //     UpdateMesh();
+    // }
+    public void Render() 
+    {
+        maxNoiseValue = 0;
+        minNoiseValue = 0;
 
         CreateShape();
         UpdateMesh();
     }
+
 
     void CreateShape()
     {
@@ -92,7 +102,7 @@ public class MeshGenerator : MonoBehaviour
             // the next row
         
         triangles = new int[xMax * zMax * 6];           // every square needs 6 stored vertice positions, even if theres only 4 actual vertices
-        int vert = 0;                                   // increments 1 every iteration of inner loop
+        int vert = 0;                                   // increments 1 every iteration of inner loop and 1 once more after every row
         int tri = 0;                                    // increments 6 every iteration of inner loop
         
         for (int z = 0; z < zMax; z++)
@@ -108,7 +118,7 @@ public class MeshGenerator : MonoBehaviour
                 triangles[tri + 3] = vert + 1;
                 triangles[tri + 4] = vert + xMax + 1;
                 triangles[tri + 5] = vert + xMax + 2;  
-
+                
                 vert++;
                 tri += 6;   
             }   
@@ -138,17 +148,18 @@ public class MeshGenerator : MonoBehaviour
         float noiseValue = Mathf.PerlinNoise(frequencyA * fx, frequencyA * fz) * amplitudeA
                          + Mathf.PerlinNoise(frequencyB * fx, frequencyB * fz) * amplitudeB 
                          + Mathf.PerlinNoise(frequencyC * fx, frequencyC * fz) * amplitudeC;
+        noiseValue = Mathf.Pow(noiseValue, redistribution);
 
         if (noiseValue > maxNoiseValue) maxNoiseValue = noiseValue;
         if (noiseValue < minNoiseValue) minNoiseValue = noiseValue;
 
-        return Mathf.Pow(noiseValue, redistribution);
+        return noiseValue;
     }
 
     private void ColorTerrain()
     {
     colors = new Color[vertices.Length];      //could just as well use the length from vertices, should be same
-    noiseDiff = maxNoiseValue - minNoiseValue;
+    float noiseDiff = maxNoiseValue - minNoiseValue;
 
     for (int z = 0, idx = 0; z < zMax + 1; z++) 
         {
@@ -174,8 +185,9 @@ public class MeshGenerator : MonoBehaviour
 
     void OnValidate() 
     {
-        if (zMax < 1) {zMax = 1;}
-        if (xMax < 1) {xMax = 1;}
-        if (lacunarity < 1) {lacunarity = 1;} 
+        if (zMax < 1) {zMax = 1;} else if (zMax > 255) {zMax = 255;} //unity has a 65535 vertice limit of a mesh
+        if (xMax < 1) {xMax = 1;} else if (xMax > 255) {xMax = 255;}
+        if (lacunarity < 1) lacunarity = 1;
+
     }
 }
