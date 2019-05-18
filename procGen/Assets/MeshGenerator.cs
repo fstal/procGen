@@ -41,8 +41,8 @@ public class MeshGenerator : MonoBehaviour
     float amplitudeC = 2f;
     
     // Variables for normalising height values
-    float maxNoiseValue;
-    float minNoiseValue;
+    float maxNoiseValue = 0;
+    float minNoiseValue = 1000;
 
 
     void Start()
@@ -60,8 +60,8 @@ public class MeshGenerator : MonoBehaviour
     // }
     public void Render() 
     {
-        maxNoiseValue = 0;
-        minNoiseValue = 0;
+        maxNoiseValue = 0f;
+        minNoiseValue = 10000f;
 
         CreateShape();
         UpdateMesh();
@@ -140,7 +140,8 @@ public class MeshGenerator : MonoBehaviour
             for (int x = 0; x < xMax + 1; x++)
             {
                 float normNoiseValue = ((vertices[idx].y - minNoiseValue) / noiseDiff);
-                colors[idx] = gradient.Evaluate(normNoiseValue);        
+                colors[idx] = gradient.Evaluate(normNoiseValue);  
+                if (normNoiseValue < 0.33f) vertices[idx].y = minNoiseValue*3f;
                 idx++;
             }
         }
@@ -149,7 +150,7 @@ public class MeshGenerator : MonoBehaviour
     void UpdateMesh()
     {
         mesh.Clear();   //clears our mesh from prev data
-
+        
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.colors = colors;

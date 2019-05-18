@@ -325,6 +325,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5ad65f5e3e004eb381bd2198e9900d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  autoUpdate: 1
   xMax: 255
   zMax: 255
   lacunarity: 1
@@ -334,21 +335,21 @@ MonoBehaviour:
   gradient:
     serializedVersion: 2
     key0: {r: 0.039159846, g: 0.056196857, b: 0.754717, a: 1}
-    key1: {r: 0.22761661, g: 0.37893385, b: 0.8773585, a: 1}
-    key2: {r: 0.26297218, g: 0.40736294, b: 0.88297236, a: 1}
+    key1: {r: 0.10484158, g: 0.3764706, b: 0.7169812, a: 1}
+    key2: {r: 0.21698111, g: 0.19163741, b: 0.1504539, a: 1}
     key3: {r: 0.19023676, g: 0.20076267, b: 0.23584908, a: 0}
-    key4: {r: 0.22963604, g: 0.23964982, b: 0.2730291, a: 0}
-    key5: {r: 1, g: 1, b: 1, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0.08966714, g: 0.6132076, b: 0.16562043, a: 0}
+    key5: {r: 0.22963604, g: 0.23964982, b: 0.2730291, a: 0}
+    key6: {r: 1, g: 1, b: 1, a: 0}
+    key7: {r: 1, g: 1, b: 1, a: 0}
     ctime0: 0
-    ctime1: 11758
-    ctime2: 16191
-    ctime3: 24287
-    ctime4: 44911
-    ctime5: 55127
-    ctime6: 0
-    ctime7: 0
+    ctime1: 19275
+    ctime2: 19661
+    ctime3: 24479
+    ctime4: 30069
+    ctime5: 44911
+    ctime6: 55127
+    ctime7: 55127
     atime0: 0
     atime1: 65535
     atime2: 65535
@@ -358,7 +359,7 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 6
+    m_NumColorKeys: 7
     m_NumAlphaKeys: 2
 --- !u!23 &1511504299
 MeshRenderer:
