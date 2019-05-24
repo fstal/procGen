@@ -33,12 +33,12 @@ public class MeshGenerator : MonoBehaviour
     public float persistance = 0;   // adjusts amplitude
     public Gradient gradient;
 
-    float frequencyA = .5f;
+    float frequencyA = .3f;
     float frequencyB = 2f;
     float frequencyC = 8f;
-    float amplitudeA = 30f;
-    float amplitudeB = 7.5f;
-    float amplitudeC = 2f;
+    float amplitudeA = 41f;
+    float amplitudeB = 8f;
+    float amplitudeC = 1.67f;
     
     // Variables for normalising height values
     float maxNoiseValue = 0;
