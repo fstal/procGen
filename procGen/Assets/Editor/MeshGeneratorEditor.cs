@@ -14,5 +14,6 @@ public class MeshGeneratorEditor : Editor
             if (meshGen.autoUpdate) meshGen.Render();
         }
         if (GUILayout.Button ("Render")) meshGen.Render();
+        if (GUILayout.Button ("Erode")) meshGen.runErosion(false);
     }
 }

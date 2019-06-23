@@ -44,6 +44,10 @@ public class MeshGenerator : MonoBehaviour
     float maxNoiseValue = 0;
     float minNoiseValue = 1000;
 
+    public ErosionScript erosionScript;
+    public bool animateErosion;
+    public int iterationsPerFrame = 1;
+
 
     void Start()
     {
@@ -65,6 +69,19 @@ public class MeshGenerator : MonoBehaviour
 
         CreateShape();
         UpdateMesh();
+        //runErosion();
+    }
+
+    void Update () {
+        if (animateErosion) {
+            for (int i = 0; i < iterationsPerFrame; i++) {
+                runErosion(true);
+            }
+            UpdateMesh();
+            //Debug.Log("DONE");
+            //numAnimatedErosionIterations += iterationsPerFrame;
+            //GenerateMesh ();
+        }
     }
 
     void CreateShape()
@@ -163,5 +180,41 @@ public class MeshGenerator : MonoBehaviour
         if (zMax < 1) {zMax = 1;} else if (zMax > 255) {zMax = 255;} //unity has a 65535 vertice limit of a mesh
         if (xMax < 1) {xMax = 1;} else if (xMax > 255) {xMax = 255;}
         if (lacunarity < 1) lacunarity = 1;
+    }
+
+    public void runErosion(bool animate)
+    {
+        //erosionScript = FindObjectOfType<ErosionScript> ();
+        //Debug.Log(erosionScript);
+        //Debug.Log(vertices[1000].y);
+        if(animate){
+            float noiseDiff = maxNoiseValue - minNoiseValue;
+            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, true);
+            //Debug.Log(maxNoiseValue + " " + minNoiseValue);
+            //ColorTerrain();
+            //UpdateMesh();
+
+        }
+        else{
+            float noiseDiff = maxNoiseValue - minNoiseValue;
+            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, false);
+            //Debug.Log(maxNoiseValue + " " + minNoiseValue);
+            //calcMinMax();
+            //Debug.Log(maxNoiseValue + " " + minNoiseValue);
+            //ColorTerrain();
+            UpdateMesh();
+        }
+        
+    }
+
+    private void calcMinMax()
+    {   
+        maxNoiseValue = 0;
+        minNoiseValue = 150;
+        for(int i = 0; i < vertices.Length; i++){
+            if (vertices[i].y > maxNoiseValue) maxNoiseValue = vertices[i].y;
+            if (vertices[i].y < minNoiseValue) minNoiseValue = vertices[i].y;
+        }
+        
     }
 }
