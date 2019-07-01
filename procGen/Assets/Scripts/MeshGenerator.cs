@@ -48,6 +48,8 @@ public class MeshGenerator : MonoBehaviour
     public ErosionScript erosionScript;
     public bool animateErosion;
     public int iterationsPerFrame = 1;
+    public int numIterations = 5;
+    public float initialWaterVolume = 5;
 
 
     void Start()
@@ -193,7 +195,7 @@ public class MeshGenerator : MonoBehaviour
         //Debug.Log(vertices[1000].y);
         if(animate){
             float noiseDiff = maxNoiseValue - minNoiseValue;
-            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, true);
+            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, true, numIterations, initialWaterVolume);
             //Debug.Log(maxNoiseValue + " " + minNoiseValue);
             //ColorTerrain();
             //UpdateMesh();
@@ -201,7 +203,7 @@ public class MeshGenerator : MonoBehaviour
         }
         else{
             float noiseDiff = maxNoiseValue - minNoiseValue;
-            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, false);
+            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, false, numIterations, initialWaterVolume);
             //Debug.Log(maxNoiseValue + " " + minNoiseValue);
             //calcMinMax();
             //Debug.Log(maxNoiseValue + " " + minNoiseValue);

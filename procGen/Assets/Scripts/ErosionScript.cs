@@ -5,11 +5,11 @@ using UnityEngine;
 public class ErosionScript : MonoBehaviour
 {
 
-    public int numIterations = 5;
+    //public int numIterations = 5;
     public int dropletLifeSpan = 1;
     public float inertia = .05f;
     public float initialSpeed = 1;
-    public float initialWaterVolume = 1;
+    //public float initialWaterVolume = 1;
     public float depositSpeed = .3f;
     public float evaporateSpeed = .01f;
     public float sedimentCapacityFactor = 4; // Multiplier for how much sediment a droplet can carry
@@ -18,11 +18,6 @@ public class ErosionScript : MonoBehaviour
     public float gravity = 4;
     bool reset = true;
     System.Random prng;
-
-
-    int[][] erosionBrushIndices;
-    float[][] erosionBrushWeights;
-    public int erosionRadius = 3;
 
     public void InitPrng(int mapX, int mapZ)
     {   
@@ -35,7 +30,7 @@ public class ErosionScript : MonoBehaviour
         }
     }
     
-    public void Erosion(Vector3[] mapVertices, int mapX, int mapZ, float noiseDiff, bool animate){
+    public void Erosion(Vector3[] mapVertices, int mapX, int mapZ, float noiseDiff, bool animate, int numIterations, float initialWaterVolume){
         
         //Initialize the random number seed. (We need this if we have enabled animation)
         InitPrng(mapX, mapZ);
