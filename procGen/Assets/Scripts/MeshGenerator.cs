@@ -24,6 +24,7 @@ public class MeshGenerator : MonoBehaviour
     public bool autoUpdate;
     public int xMax = 255;           //xSize  height
     public int zMax = 255;           //zSize  width
+    private int seed;
 
     public float lacunarity = 1f;           //how much detail that is added or removed from each octave, adjusts our frequency
     public float scale = 10.03f;            // basically distance from which we view noisemap
@@ -58,10 +59,7 @@ public class MeshGenerator : MonoBehaviour
         UpdateMesh();
     }
 
-    // void Update()
-    // {
-    //     UpdateMesh();
-    // }
+
     public void Render() 
     {
         maxNoiseValue = 0f;
@@ -69,7 +67,6 @@ public class MeshGenerator : MonoBehaviour
 
         CreateShape();
         UpdateMesh();
-        //runErosion();
     }
 
     void Update () {
@@ -78,10 +75,16 @@ public class MeshGenerator : MonoBehaviour
                 runErosion(true);
             }
             UpdateMesh();
-            //Debug.Log("DONE");
-            //numAnimatedErosionIterations += iterationsPerFrame;
-            //GenerateMesh ();
         }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            seed += 100;
+            Debug.Log(seed);
+            CreateShape();
+            UpdateMesh();
+
+        }
+
     }
 
     void CreateShape()
@@ -135,10 +138,11 @@ public class MeshGenerator : MonoBehaviour
     { 
         float fx = (float)x / xMax * scale;
         float fz = (float)z / zMax * scale;
+        System.Random RandomGenerator = new System.Random(seed);
 
-        float noiseValue = Mathf.PerlinNoise(frequencyA * fx, frequencyA * fz) * amplitudeA
-                         + Mathf.PerlinNoise(frequencyB * fx, frequencyB * fz) * amplitudeB 
-                         + Mathf.PerlinNoise(frequencyC * fx, frequencyC * fz) * amplitudeC;
+        float noiseValue = Mathf.PerlinNoise((float)RandomGenerator.NextDouble() + (frequencyA * fx), frequencyA * fz) * amplitudeA
+                         + Mathf.PerlinNoise((float)RandomGenerator.NextDouble() + (frequencyB) * fx, frequencyB * fz) * amplitudeB 
+                         + Mathf.PerlinNoise((float)RandomGenerator.NextDouble() + (frequencyC) * fx, frequencyC * fz) * amplitudeC;
         noiseValue = Mathf.Pow(noiseValue, redistribution);
 
         if (noiseValue > maxNoiseValue) maxNoiseValue = noiseValue;

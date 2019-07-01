@@ -22,7 +22,6 @@ public class Menu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Debug.Log("Pressed P");
             if(Time.timeScale == 1)
             {
                 Time.timeScale = 0;
@@ -64,10 +63,5 @@ public class Menu : MonoBehaviour
         meshScript.redistribution = redistributionSlider.value;
     }
 
-    //public void NewLacunarity()
-    //{
-    //    lacunaritySlider = GameObject.FindGameObjectWithTag("Lacunarity").GetComponent<Slider>();
-    //    meshScript.lacunarity = lacunaritySlider.value;
-    //}
 
 }
