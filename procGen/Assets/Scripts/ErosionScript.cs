@@ -5,11 +5,11 @@ using UnityEngine;
 public class ErosionScript : MonoBehaviour
 {
 
-    public int numIterations = 5;
+    //public int numIterations = 5;
     public int dropletLifeSpan = 1;
     public float inertia = .05f;
     public float initialSpeed = 1;
-    public float initialWaterVolume = 1;
+    //public float initialWaterVolume = 1;
     public float depositSpeed = .3f;
     public float evaporateSpeed = .01f;
     public float sedimentCapacityFactor = 4; // Multiplier for how much sediment a droplet can carry
@@ -18,11 +18,6 @@ public class ErosionScript : MonoBehaviour
     public float gravity = 4;
     bool reset = true;
     System.Random prng;
-
-
-    int[][] erosionBrushIndices;
-    float[][] erosionBrushWeights;
-    public int erosionRadius = 3;
 
     public void InitPrng(int mapX, int mapZ)
     {   
@@ -35,7 +30,7 @@ public class ErosionScript : MonoBehaviour
         }
     }
     
-    public void Erosion(Vector3[] mapVertices, int mapX, int mapZ, float noiseDiff, bool animate){
+    public void Erosion(Vector3[] mapVertices, int mapX, int mapZ, float noiseDiff, bool animate, int numIterations, float initialWaterVolume){
         
         //Initialize the random number seed. (We need this if we have enabled animation)
         InitPrng(mapX, mapZ);
@@ -56,9 +51,6 @@ public class ErosionScript : MonoBehaviour
             float speed = initialSpeed;
             float water = initialWaterVolume;
             float sediment = 0;
-
-
-
 
             //Droplet doing droplet things during it's lifetime.
             //We do everything for each droplet after we create it.
@@ -114,7 +106,15 @@ public class ErosionScript : MonoBehaviour
                 // If carrying more sediment than capacity, or if flowing uphill we want to deposit sediment
                 if (sediment > sedimentCapacity || deltaHeight > 0) {
                     //Add sediment to the landscape through bilinear interpolation if the droplet is carrying too much
-                    float amountToDeposit = (deltaHeight > 0) ? Mathf.Min (deltaHeight, sediment) : (sediment - sedimentCapacity) * depositSpeed;
+                    float amountToDeposit;
+                    if(deltaHeight > 0)
+                    {
+                        amountToDeposit = Mathf.Min (deltaHeight, sediment);
+                    }
+                    else
+                    {
+                        amountToDeposit = (sediment - sedimentCapacity) * depositSpeed;
+                    }
                     sediment -= amountToDeposit;
 
                     mapVertices[dropletIndex].y += amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetZ);
@@ -127,8 +127,13 @@ public class ErosionScript : MonoBehaviour
                     //Give the droplet more sediment
                     float amountToErode = Mathf.Min((sedimentCapacity - sediment) * erodeSpeed, -deltaHeight);                    
                     float currDroplet = mapVertices[dropletIndex].y/noiseDiff;
-                    float weighedErodeAmount = amountToErode;
-                    float deltaSediment = (currDroplet < amountToErode) ? currDroplet : amountToErode;
+                    float deltaSediment;
+                    if(currDroplet < amountToErode){
+                        deltaSediment = currDroplet;
+                    }
+                    else{
+                        deltaSediment = amountToErode;
+                    }
 
                     //Since map isn't at 0 we don't go below 20
                     if(mapVertices[dropletIndex].y > 20){

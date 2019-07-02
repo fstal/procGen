@@ -24,6 +24,7 @@ public class MeshGenerator : MonoBehaviour
     public bool autoUpdate;
     public int xMax = 255;           //xSize  height
     public int zMax = 255;           //zSize  width
+    private int seed;
 
     public float lacunarity = 1f;           //how much detail that is added or removed from each octave, adjusts our frequency
     public float scale = 10.03f;            // basically distance from which we view noisemap
@@ -47,6 +48,8 @@ public class MeshGenerator : MonoBehaviour
     public ErosionScript erosionScript;
     public bool animateErosion;
     public int iterationsPerFrame = 1;
+    public int numIterations = 5;
+    public float initialWaterVolume = 5;
 
 
     void Start()
@@ -58,10 +61,7 @@ public class MeshGenerator : MonoBehaviour
         UpdateMesh();
     }
 
-    // void Update()
-    // {
-    //     UpdateMesh();
-    // }
+
     public void Render() 
     {
         maxNoiseValue = 0f;
@@ -69,7 +69,6 @@ public class MeshGenerator : MonoBehaviour
 
         CreateShape();
         UpdateMesh();
-        //runErosion();
     }
 
     void Update () {
@@ -78,10 +77,21 @@ public class MeshGenerator : MonoBehaviour
                 runErosion(true);
             }
             UpdateMesh();
-            //Debug.Log("DONE");
-            //numAnimatedErosionIterations += iterationsPerFrame;
-            //GenerateMesh ();
         }
+        //if (Input.GetKeyDown(KeyCode.R))
+        //{
+        //    seed += 100;
+        //    CreateShape();
+        //    UpdateMesh();
+        //}
+
+    }
+
+    public void GenerateNewMap()
+    {
+        seed += 100;
+        CreateShape();
+        UpdateMesh();
     }
 
     void CreateShape()
@@ -136,9 +146,13 @@ public class MeshGenerator : MonoBehaviour
         float fx = (float)x / xMax * scale;
         float fz = (float)z / zMax * scale;
 
-        float noiseValue = Mathf.PerlinNoise(frequencyA * fx, frequencyA * fz) * amplitudeA
-                         + Mathf.PerlinNoise(frequencyB * fx, frequencyB * fz) * amplitudeB 
-                         + Mathf.PerlinNoise(frequencyC * fx, frequencyC * fz) * amplitudeC;
+        // if we want to use a random seed, but the below did not work as well as I wanted it to
+        //System.Random RandomGenerator = new System.Random(seed);
+        //(float)RandomGenerator.NextDouble() 
+
+        float noiseValue = Mathf.PerlinNoise(seed + (frequencyA * fx), frequencyA * fz) * amplitudeA
+                         + Mathf.PerlinNoise(seed + (frequencyB * fx), frequencyB * fz) * amplitudeB 
+                         + Mathf.PerlinNoise(seed + (frequencyC * fx), frequencyC * fz) * amplitudeC;
         noiseValue = Mathf.Pow(noiseValue, redistribution);
 
         if (noiseValue > maxNoiseValue) maxNoiseValue = noiseValue;
@@ -189,7 +203,7 @@ public class MeshGenerator : MonoBehaviour
         //Debug.Log(vertices[1000].y);
         if(animate){
             float noiseDiff = maxNoiseValue - minNoiseValue;
-            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, true);
+            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, true, numIterations, initialWaterVolume);
             //Debug.Log(maxNoiseValue + " " + minNoiseValue);
             //ColorTerrain();
             //UpdateMesh();
@@ -197,7 +211,7 @@ public class MeshGenerator : MonoBehaviour
         }
         else{
             float noiseDiff = maxNoiseValue - minNoiseValue;
-            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, false);
+            erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, false, numIterations, initialWaterVolume);
             //Debug.Log(maxNoiseValue + " " + minNoiseValue);
             //calcMinMax();
             //Debug.Log(maxNoiseValue + " " + minNoiseValue);
