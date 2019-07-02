@@ -52,9 +52,6 @@ public class ErosionScript : MonoBehaviour
             float water = initialWaterVolume;
             float sediment = 0;
 
-
-
-
             //Droplet doing droplet things during it's lifetime.
             //We do everything for each droplet after we create it.
             for (int dropletLife = 0; dropletLife < dropletLifeSpan; dropletLife++)
@@ -109,7 +106,15 @@ public class ErosionScript : MonoBehaviour
                 // If carrying more sediment than capacity, or if flowing uphill we want to deposit sediment
                 if (sediment > sedimentCapacity || deltaHeight > 0) {
                     //Add sediment to the landscape through bilinear interpolation if the droplet is carrying too much
-                    float amountToDeposit = (deltaHeight > 0) ? Mathf.Min (deltaHeight, sediment) : (sediment - sedimentCapacity) * depositSpeed;
+                    float amountToDeposit;
+                    if(deltaHeight > 0)
+                    {
+                        amountToDeposit = Mathf.Min (deltaHeight, sediment);
+                    }
+                    else
+                    {
+                        amountToDeposit = (sediment - sedimentCapacity) * depositSpeed;
+                    }
                     sediment -= amountToDeposit;
 
                     mapVertices[dropletIndex].y += amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetZ);
@@ -122,8 +127,13 @@ public class ErosionScript : MonoBehaviour
                     //Give the droplet more sediment
                     float amountToErode = Mathf.Min((sedimentCapacity - sediment) * erodeSpeed, -deltaHeight);                    
                     float currDroplet = mapVertices[dropletIndex].y/noiseDiff;
-                    float weighedErodeAmount = amountToErode;
-                    float deltaSediment = (currDroplet < amountToErode) ? currDroplet : amountToErode;
+                    float deltaSediment;
+                    if(currDroplet < amountToErode){
+                        deltaSediment = currDroplet;
+                    }
+                    else{
+                        deltaSediment = amountToErode;
+                    }
 
                     //Since map isn't at 0 we don't go below 20
                     if(mapVertices[dropletIndex].y > 20){
