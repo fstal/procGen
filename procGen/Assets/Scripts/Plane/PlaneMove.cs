@@ -52,25 +52,5 @@ public class PlaneMove : MonoBehaviour
             planeBody.MoveRotation(planeBody.rotation * deltaRotation);
         }
 
-
-        
-        //planeBody.AddForce(Vector3.forward*speed);
-
-
-        /* 
-        planeBody.velocity = Vector3.forward 
-
-        
-        
-        
-        
-
-        if (Input.GetKey(KeyCode.D)) {
-            Debug.Log("hej");
-            Vector3 tempVect = new Vector3(0, 0, -100);
-            Quaternion deltaRotation = Quaternion.Euler(tempVect * Time.deltaTime);
-            //tempVect = tempVect.normalized * speed * Time.deltaTime;
-            planeBody.MoveRotation(planeBody.rotation * deltaRotation);
-        }*/
     }
 }
