@@ -78,15 +78,20 @@ public class MeshGenerator : MonoBehaviour
             }
             UpdateMesh();
         }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            seed += 100;
-            Debug.Log(seed);
-            CreateShape();
-            UpdateMesh();
+        //if (Input.GetKeyDown(KeyCode.R))
+        //{
+        //    seed += 100;
+        //    CreateShape();
+        //    UpdateMesh();
+        //}
 
-        }
+    }
 
+    public void GenerateNewMap()
+    {
+        seed += 100;
+        CreateShape();
+        UpdateMesh();
     }
 
     void CreateShape()
@@ -140,11 +145,14 @@ public class MeshGenerator : MonoBehaviour
     { 
         float fx = (float)x / xMax * scale;
         float fz = (float)z / zMax * scale;
-        System.Random RandomGenerator = new System.Random(seed);
 
-        float noiseValue = Mathf.PerlinNoise((float)RandomGenerator.NextDouble() + (frequencyA * fx), frequencyA * fz) * amplitudeA
-                         + Mathf.PerlinNoise((float)RandomGenerator.NextDouble() + (frequencyB) * fx, frequencyB * fz) * amplitudeB 
-                         + Mathf.PerlinNoise((float)RandomGenerator.NextDouble() + (frequencyC) * fx, frequencyC * fz) * amplitudeC;
+        // if we want to use a random seed, but the below did not work as well as I wanted it to
+        //System.Random RandomGenerator = new System.Random(seed);
+        //(float)RandomGenerator.NextDouble() 
+
+        float noiseValue = Mathf.PerlinNoise(seed + (frequencyA * fx), frequencyA * fz) * amplitudeA
+                         + Mathf.PerlinNoise(seed + (frequencyB * fx), frequencyB * fz) * amplitudeB 
+                         + Mathf.PerlinNoise(seed + (frequencyC * fx), frequencyC * fz) * amplitudeC;
         noiseValue = Mathf.Pow(noiseValue, redistribution);
 
         if (noiseValue > maxNoiseValue) maxNoiseValue = noiseValue;

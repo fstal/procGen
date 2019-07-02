@@ -14,9 +14,9 @@ public class Menu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Time.timeScale = 1;
+        Time.timeScale = 0;
         pauseObjects = GameObject.FindGameObjectsWithTag("ShowOnPause");
-        HidePause();
+        ShowPaused();
         meshScript = GameObject.FindGameObjectWithTag("MeshGenerator").GetComponent<MeshGenerator>();
     }
 
