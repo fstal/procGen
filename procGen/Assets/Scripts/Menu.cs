@@ -86,5 +86,4 @@ public class Menu : MonoBehaviour
         meshScript.initialWaterVolume = dropletSlider.value;
     }
 
-
 }
