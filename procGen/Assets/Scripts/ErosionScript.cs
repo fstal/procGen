@@ -5,18 +5,16 @@ using UnityEngine;
 public class ErosionScript : MonoBehaviour
 {
 
-    //public int numIterations = 5;
-    public int dropletLifeSpan = 1;
-    public float inertia = .05f;
+    public int dropletLifeSpan = 1; //How many iterations each droplet runs for
+    public float inertia = .05f; //Makes it so that the droplet doesn't stick to the first crevice it meets
     public float initialSpeed = 1;
-    //public float initialWaterVolume = 1;
-    public float depositSpeed = .3f;
-    public float evaporateSpeed = .01f;
+    public float depositSpeed = .3f; //Factor to decide how much sediemnt is deposited
+    public float evaporateSpeed = .01f; //Making the droplet a bit smaller each run
     public float sedimentCapacityFactor = 4; // Multiplier for how much sediment a droplet can carry
-    public float minSedimentCapacity = .01f; // Used to prevent carry capacity getting too close to zero on flatter terrain
-    public float erodeSpeed = .3f;
-    public float gravity = 4;
-    bool reset = true;
+    public float minSedimentCapacity = .01f; // Prevent carry capacity going to zero since it would flatten terrain.
+    public float erodeSpeed = .3f; //Factor to decide how much ground is eroded
+    public float gravity = 4; //Speeds up droplet
+    bool reset = true; //Used for animation
     System.Random prng;
 
     public void InitPrng(int mapX, int mapZ)
@@ -25,7 +23,6 @@ public class ErosionScript : MonoBehaviour
         if(reset)
         {
             prng = new System.Random (0);
-            //InitializeBrushIndices (mapX, mapZ, erosionRadius);
             reset = false;
         }
     }

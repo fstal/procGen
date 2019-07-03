@@ -193,24 +193,17 @@ public class MeshGenerator : MonoBehaviour
 
     public void runErosion(bool animate)
     {
-        //erosionScript = FindObjectOfType<ErosionScript> ();
-        //Debug.Log(erosionScript);
-        //Debug.Log(vertices[1000].y);
+        //Animate = Run erosion in real time. Sadly too performance intensive to give a smooth playing experience at the same time.
         if(animate){
             float noiseDiff = maxNoiseValue - minNoiseValue;
             erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, true, numIterations, initialWaterVolume);
-            //Debug.Log(maxNoiseValue + " " + minNoiseValue);
-            //ColorTerrain();
-            //UpdateMesh();
+
 
         }
         else{
             float noiseDiff = maxNoiseValue - minNoiseValue;
             erosionScript.Erosion(vertices, xMax, zMax, noiseDiff, false, numIterations, initialWaterVolume);
-            //Debug.Log(maxNoiseValue + " " + minNoiseValue);
-            //calcMinMax();
-            //Debug.Log(maxNoiseValue + " " + minNoiseValue);
-            //ColorTerrain();
+
             UpdateMesh();
         }
         
