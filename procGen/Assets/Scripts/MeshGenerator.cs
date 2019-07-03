@@ -78,18 +78,12 @@ public class MeshGenerator : MonoBehaviour
             }
             UpdateMesh();
         }
-        //if (Input.GetKeyDown(KeyCode.R))
-        //{
-        //    seed += 100;
-        //    CreateShape();
-        //    UpdateMesh();
-        //}
-
     }
 
     public void GenerateNewMap()
     {
-        seed += 100;
+        //seed += 100;
+        seed = Random.Range(0, 100);
         CreateShape();
         UpdateMesh();
     }
@@ -107,15 +101,16 @@ public class MeshGenerator : MonoBehaviour
                 idx++;
             }
         }
+
         // here it gets a bit tricky, since we want to handle the issues of backface culling
         // we need to have the vertices of each triangle (every set of three elements) given
         // in a clockwise order.
         // e.g [0, 1, 2, 1, 3, 2] would be the two first triangles, forming a square =>
         //[ (0,0,0), (0,0,1), (1,0,0), (0,0,1), (1,0,1), (1,0,0) ]
-            
-            //had weird ass behaviour where it connected last square in a row with first square on
-            // the next row, write in blog
-        
+
+        //had weird ass behaviour where it connected last square in a row with first square on
+        // the next row, write in blog
+
         //int vert = 0;                                   // increments 1 every iteration of inner loop and 1 once more after every row
         //int tri = 0;                                    // increments 6 every iteration of inner loop
         triangles = new int[xMax * zMax * 6];             // every square needs 6 stored vertice positions, even if there's only 4 actual vertices
@@ -150,9 +145,9 @@ public class MeshGenerator : MonoBehaviour
         //System.Random RandomGenerator = new System.Random(seed);
         //(float)RandomGenerator.NextDouble() 
 
-        float noiseValue = Mathf.PerlinNoise(seed + (frequencyA * fx), frequencyA * fz) * amplitudeA
-                         + Mathf.PerlinNoise(seed + (frequencyB * fx), frequencyB * fz) * amplitudeB 
-                         + Mathf.PerlinNoise(seed + (frequencyC * fx), frequencyC * fz) * amplitudeC;
+        float noiseValue = Mathf.PerlinNoise(seed + (frequencyA * fx), seed + (frequencyA * fz)) * amplitudeA
+                         + Mathf.PerlinNoise(seed + (frequencyB * fx), seed + (frequencyB * fz)) * amplitudeB 
+                         + Mathf.PerlinNoise(seed + (frequencyC * fx), seed + (frequencyC * fz)) * amplitudeC;
         noiseValue = Mathf.Pow(noiseValue, redistribution);
 
         if (noiseValue > maxNoiseValue) maxNoiseValue = noiseValue;
